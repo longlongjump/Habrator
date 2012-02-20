@@ -50,13 +50,26 @@ desc "Create cron job"
 file 'cron.job' do
   dir = File.expand_path(File.dirname(__FILE__))
   bundler_path = `which bundle`
+  cron_tasks = `crontab -l`
   File.open('cron.job','a') do |file|
-    file.write "#{`crontab -l`}\n" 
-    file.write "* * * * * cd #{dir} && #{bundler_path[0..-2]} exec rake update_posts"
+    file.write "#"*200
+
+    file.write "#{cron_tasks}\n" unless cron_tasks.include? "crontab: no crontab for"
+    ["GEM_HOME", "GEM_PATH", "PATH"].each do |path|
+      file.write "#{path}=#{ENV[path]}\n" if ENV.include? path
+    end
+    file.write "* * * * * cd #{dir} && #{bundler_path[0..-2]} exec rake update_posts\n"
+
+    file.write "#"*200
   end
   sh %{crontab cron.job}
 end
 
+desc "Set up"
+task :setup => ["cron.job", "posts.db", :update_posts ] do
+  puts "Setup"
+end
 
-task :default => ["post.db"]
+
+task :default => [:update_posts]
 

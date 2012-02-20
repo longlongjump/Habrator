@@ -1,5 +1,6 @@
 source "http://rubygems.org"
 
+gem "rake", "~> 0.9.2.2"
 gem "rack", "~> 1.4.1"
 gem "json", "~> 1.6.5"
 gem "sqlite3-ruby", "~> 1.3.3"
