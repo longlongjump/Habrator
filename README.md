@@ -8,13 +8,16 @@ You may create an twitter app for using it.
 Installation
 -------
 
-    git clone
+    git clone git://github.com/nerohellier/Habrator.git
+    cd your/path/to/Habrator
     bundle install
 
-  Will update you cron file
+Will update you cron file
+
     rake setup
 
-  To start server
+To start server
+
     rackup config.ru
 
 
