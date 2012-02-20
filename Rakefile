@@ -1,6 +1,7 @@
 require 'sequel'
 require 'open-uri'
 require 'nokogiri'
+require './twitter_notification'
 
 desc "Create Posts database"
 file "posts.db" do
@@ -32,13 +33,16 @@ desc "Update posts"
 task :update_posts => 'posts.db' do
   post_set = Sequel.sqlite('posts.db')[:posts]
   posts = habr_posts
+  new_post = nil
   posts.each do |post|
     begin
       post_set.insert(post)
+      new_post ||= post
     rescue Exception => e
       puts e
     end
   end
+  SpamNotification::notificate_new_post new_post if new_post
 end
 
 
