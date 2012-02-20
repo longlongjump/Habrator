@@ -42,6 +42,7 @@ task :update_posts => 'posts.db' do
       puts e
     end
   end
+
   SpamNotification::notificate_new_post new_post if new_post
 end
 
@@ -58,7 +59,7 @@ file 'cron.job' do
     ["GEM_HOME", "GEM_PATH", "PATH"].each do |path|
       file.write "#{path}=#{ENV[path]}\n" if ENV.include? path
     end
-    file.write "* * * * * cd #{dir} && #{bundler_path[0..-2]} exec rake update_posts\n"
+    file.write "0 1 * * * cd #{dir} && #{bundler_path[0..-2]} exec rake update_posts\n"
 
     file.write "#"*200
   end
