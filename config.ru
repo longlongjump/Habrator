@@ -14,7 +14,7 @@ class Habrator
     case path
     when "/posts"
       p = @db[:posts].order(:id.desc)
-      [200, {'Content-Type'=>'text/plain'}, StringIO.new(JSON(p))]
+      [200, {'Content-Type'=>'text/plain'}, StringIO.new(JSON(p.all))]
     else
       Rack::File.new('static/index.html').call(env)
     end
