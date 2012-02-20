@@ -10,10 +10,12 @@ module SpamNotification
   end
   
   def self.notificate_new_post(post)
-    tweet = "#{post[:title]} #{post[:url]}"
-    Twitter.update(tweet)  
+    begin
+      tweet = "#{post[:title]} #{post[:url]}"
+      Twitter.update(tweet)  
+    rescue Exception => e
+      puts e
+    end
   end
 
-
 end
-
