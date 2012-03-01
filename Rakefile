@@ -1,7 +1,9 @@
 require 'sequel'
 require 'open-uri'
 require 'nokogiri'
+require 'rspec/core/rake_task'
 require './twitter_notification'
+require './lib/cronify'
 
 desc "Create Posts database"
 file "posts.db" do
@@ -49,28 +51,28 @@ end
 
 desc "Create cron job"
 file 'cron.job' do
+  Cronify.pop 'habrator'
+
   dir = File.expand_path(File.dirname(__FILE__))
-  bundler_path = `which bundle`
-  cron_tasks = `crontab -l`
-  File.open('cron.job','a') do |file|
-    file.write "#"*200
-
-    file.write "#{cron_tasks}\n" unless cron_tasks.include? "crontab: no crontab for"
-    ["GEM_HOME", "GEM_PATH", "PATH"].each do |path|
-      file.write "#{path}=#{ENV[path]}\n" if ENV.include? path
-    end
-    file.write "0 1 * * * cd #{dir} && #{bundler_path[0..-2]} exec rake update_posts\n"
-
-    file.write "#"*200
+  Cronify.push 'habrator' do |tasks| 
+   tasks << "1 0 * * * cd #{dir} && rake update_posts"
   end
-  sh %{crontab cron.job}
 end
+
+
+desc "Create cron job"
+file :uninstall do
+  Cronify.pop 'habrator'
+end
+
 
 desc "Set up"
 task :setup => ["cron.job", "posts.db", :update_posts ] do
-  puts "Setup"
+  puts "Setup complete"
 end
 
+
+RSpec::Core::RakeTask.new(:spec)
 
 task :default => [:update_posts]
 
